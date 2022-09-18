@@ -43,8 +43,8 @@ async def main():
                                 df.iloc[-1].Price / float(order['fills'][0]['price']) > 1.002:
                             order = force(client=binance_client, quantity=quantity, type="SELL")
                             open_position = False
-                            quantity = 0
                             selling_price = float(order['fills'][0]['price'])
+                            quantity -= selling_price
                             print(f'Order: {order}, Sell Price: {selling_price}')
                             print(f'You made {(selling_price - buy_price) / buy_price} profit')
                             print(f'It equals to {(selling_price - buy_price) * quantity} dollars')
