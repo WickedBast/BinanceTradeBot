@@ -7,8 +7,6 @@ from binance import AsyncClient, BinanceSocketManager
 from binance.client import Client
 from dotenv import load_dotenv
 
-global quantity
-
 
 async def main():
     load_dotenv()
@@ -19,6 +17,8 @@ async def main():
     binance_client = Client(api_key=os.getenv('BINANCE_API_KEY'), api_secret=os.getenv('BINANCE_SECRET_KEY'))
     df = pd.DataFrame()
     open_position = False
+    quantity = 7.5
+    # quantity = round(float(binance_client.get_asset_balance('BUSD')['free']) / float(res['p']), 2) - 0.2
 
     async with ts as tscm:
         while True:
@@ -28,9 +28,6 @@ async def main():
                 if not open_position:
                     if ta.momentum.roc(df.Price, 30).iloc[-1] > 0 and \
                             ta.momentum.roc(df.Price, 30).iloc[-2]:
-                        quantity = round(
-                            float(binance_client.get_asset_balance('BUSD')['free']) / float(res['p']), 2
-                        ) - 0.2
                         order = binance_client.create_order(
                             symbol='LUNABUSD',
                             side='BUY',
