@@ -7,6 +7,8 @@ from binance import AsyncClient, BinanceSocketManager
 from binance.client import Client
 from dotenv import load_dotenv
 
+global quantity
+
 
 async def main():
     load_dotenv()
@@ -17,7 +19,6 @@ async def main():
     binance_client = Client(api_key=os.getenv('BINANCE_API_KEY'), api_secret=os.getenv('BINANCE_SECRET_KEY'))
     df = pd.DataFrame()
     open_position = False
-    quantity = 0
 
     async with ts as tscm:
         while True:
