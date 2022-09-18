@@ -17,8 +17,7 @@ async def main():
     binance_client = Client(api_key=os.getenv('BINANCE_API_KEY'), api_secret=os.getenv('BINANCE_SECRET_KEY'))
     df = pd.DataFrame()
     open_position = False
-    quantity = 7.5
-    # quantity = round(float(binance_client.get_asset_balance('BUSD')['free']) / float(res['p']), 2) - 0.2
+    quantity = 0
 
     async with ts as tscm:
         while True:
@@ -32,7 +31,9 @@ async def main():
                             symbol='LUNABUSD',
                             side='BUY',
                             type='MARKET',
-                            quantity=quantity
+                            quantity=round(
+                                float(binance_client.get_asset_balance('BUSD')['free']) / float(res['p']), 2
+                            ) - 0.2
                         )
                         open_position = True
                         buy_price = float(order['fills'][0]['price'])
@@ -50,7 +51,7 @@ async def main():
                                 symbol='LUNABUSD',
                                 side='SELL',
                                 type='MARKET',
-                                quantity=quantity
+                                quantity=quantity - 0.1
                             )
                             open_position = False
                             selling_price = float(order['fills'][0]['price'])
