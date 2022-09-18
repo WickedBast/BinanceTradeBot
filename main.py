@@ -27,15 +27,8 @@ async def main():
                 if not open_position:
                     if ta.momentum.roc(df.Price, 30).iloc[-1] > 0 and \
                             ta.momentum.roc(df.Price, 30).iloc[-2]:
-                        quantity = round(
-                                float(binance_client.get_asset_balance('BUSD')['free']) / float(res['p']), 2
-                            ) - 0.2
-                        order = binance_client.create_order(
-                            symbol='LUNABUSD',
-                            side='BUY',
-                            type='MARKET',
-                            quantity=quantity
-                        )
+                        quantity = round(float(binance_client.get_asset_balance('BUSD')['free']) / float(res['p']), 2)
+                        order = force(client=binance_client, quantity=quantity, type="BUY")
                         open_position = True
                         buy_price = float(order['fills'][0]['price'])
                         print(f'Order: {order}, Buy Price: {buy_price}')
@@ -48,13 +41,9 @@ async def main():
                         subdf['trailingstop'] = subdf['highest'] * 0.995
                         if subdf.iloc[-1].Price < subdf.iloc[-1].trailingstop or \
                                 df.iloc[-1].Price / float(order['fills'][0]['price']) > 1.002:
-                            order = binance_client.create_order(
-                                symbol='LUNABUSD',
-                                side='SELL',
-                                type='MARKET',
-                                quantity=quantity - 0.1
-                            )
+                            order = force(client=binance_client, quantity=quantity, type="SELL")
                             open_position = False
+                            quantity = 0
                             selling_price = float(order['fills'][0]['price'])
                             print(f'Order: {order}, Sell Price: {selling_price}')
                             print(f'You made {(selling_price - buy_price) / buy_price} profit')
@@ -63,8 +52,32 @@ async def main():
                             file = open("profits.txt", "a")
                             file.write(f"Profit: {(selling_price - buy_price) / buy_price}")
                             file.close()
-            print(open_position)
-            print(quantity)
+            print(f"Holding {quantity} LUNA")
+
+
+def force(client, quantity, type):
+    if type == "BUY":
+        try:
+            order = client.create_order(
+                symbol='LUNABUSD',
+                side='BUY',
+                type='MARKET',
+                quantity=quantity
+            )
+            return order
+        except:
+            force(client, (quantity - 0.02), type)
+    else:
+        try:
+            order = client.create_order(
+                symbol='LUNABUSD',
+                side='SELL',
+                type='MARKET',
+                quantity=quantity
+            )
+            return order
+        except:
+            force(client, (quantity - 0.02), type)
 
 
 def createFrame(msg):
