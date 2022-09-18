@@ -27,13 +27,14 @@ async def main():
                 if not open_position:
                     if ta.momentum.roc(df.Price, 30).iloc[-1] > 0 and \
                             ta.momentum.roc(df.Price, 30).iloc[-2]:
+                        quantity = round(
+                                float(binance_client.get_asset_balance('BUSD')['free']) / float(res['p']), 2
+                            ) - 0.2
                         order = binance_client.create_order(
                             symbol='LUNABUSD',
                             side='BUY',
                             type='MARKET',
-                            quantity=round(
-                                float(binance_client.get_asset_balance('BUSD')['free']) / float(res['p']), 2
-                            ) - 0.2
+                            quantity=quantity
                         )
                         open_position = True
                         buy_price = float(order['fills'][0]['price'])
