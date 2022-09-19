@@ -44,14 +44,17 @@ async def main():
                             order = force(client=binance_client, quantity=quantity, type="SELL")
                             open_position = False
                             selling_price = float(order['fills'][0]['price'])
-                            quantity -= selling_price
                             print(f'Order: {order}, Sell Price: {selling_price}')
-                            print(f'You made {(selling_price - buy_price) / buy_price} profit')
+                            print(f'You made {(selling_price - buy_price) / buy_price}% profit')
                             print(f'It equals to {(selling_price - buy_price) * quantity} dollars')
 
                             file = open("profits.txt", "a")
-                            file.write(f"Profit: {(selling_price - buy_price) / buy_price} \n")
+                            file.write(f"Profit: {(selling_price - buy_price) / buy_price}% \n")
+                            file.write(f'It equals to {(selling_price - buy_price) * quantity} dollars \n')
                             file.close()
+
+                            quantity -= float(order['executedQty'])
+
             print(f"Holding {quantity} LUNA")
 
 
