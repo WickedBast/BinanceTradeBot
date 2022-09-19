@@ -50,7 +50,7 @@ async def main():
                             print(f'It equals to {(selling_price - buy_price) * quantity} dollars')
 
                             file = open("profits.txt", "a")
-                            file.write(f"Profit: {(selling_price - buy_price) / buy_price}")
+                            file.write(f"Profit: {(selling_price - buy_price) / buy_price} \n")
                             file.close()
             print(f"Holding {quantity} LUNA")
 
